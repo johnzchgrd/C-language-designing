@@ -1,0 +1,21 @@
+#include<stdio.h>
+int main() {
+int i,h,m,time,delta;
+
+  scanf("%d%d",&i,&delta);
+  h=i/100;
+  m=i%100;
+ if(delta>=0){
+  m+=delta%60;
+  h+=delta/60+m/60;
+  m=m%60;
+}
+else {
+	h-=(-delta)/60+1;
+	m+=60-(-delta)%60;
+	h+=m/60;
+}
+  time = 100*h+m;
+  printf("%d",time);
+  return 0;
+}
