@@ -1,0 +1,25 @@
+#include<stdio.h>
+int i=0; 
+int next(int n){
+int sum=0; 
+int power=1,temp;
+temp = n/10;
+while(temp>0){
+   power*=10; temp/=10; 
+   } 
+while(power>0){ 
+   sum+=n/power; n%=power; power/=10;
+   } 
+  sum = 1+ 3*sum;
+  i++; 
+  return sum; 
+  } 
+int main(){ 
+  int a,n;
+
+  scanf("%d",&n);
+  do{a=next(n);
+  printf("%d:%d\n",i,a);
+  }while(a!=n);
+  return 0;
+}
