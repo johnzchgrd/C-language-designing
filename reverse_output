@@ -1,0 +1,12 @@
+#include<stdio.h>
+main(){
+	int i,j,a[]={1,2,3,4};
+
+	for(i=3;i>=0;i--){
+		for(j=i;j>0;j--){
+			printf(" ");
+		}
+		printf("%d\r",a[3-i]);
+	}
+	return 0;
+}
