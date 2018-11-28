@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAXS 10
+
+char* str_cat ( char * dst , const char * src );
+
+int main()
+{
+    char *p;
+    char str1[MAXS+MAXS] = {'\0'}, str2[MAXS] = {'\0'};
+
+    scanf("%s%s", str1, str2);
+    p = str_cat(str1, str2);
+    printf("%s\n%s\n", p, str1);
+
+    return 0;
+}
+//strcat函数源码
+char* str_cat ( char * dst , const char * src )
+{
+
+char * cp = dst;
+
+while( *cp )
+
+cp++; /* find end of dst */
+
+while( *cp++ = *src++ ) ; /* Copy src to end of dst */
+
+return( dst ); /* return dst */
+
+}
