@@ -1,0 +1,38 @@
+#include <stdio.h>
+#define MAXS 30
+
+char *search(char *s, char *t);
+
+int main()
+{
+    char s[MAXS], t[MAXS], *pos;
+
+    gets(s);
+    gets(t);
+    pos = search(s, t);
+    if ( pos != NULL )
+        printf("%d\n", pos - s);
+    else
+        printf("-1\n");
+
+    return 0;
+}
+char *search( char *s, char *t ){
+   
+   while(*s){
+   	
+   	char*p=s;
+   	char*m=t;
+     while(*p){
+       if(*p!=*m)
+       break;
+       p++;
+       m++;
+	 }
+    
+    if(*m==0)
+   return s;
+   s++;
+  }
+  return NULL;
+}
