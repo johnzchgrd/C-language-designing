@@ -1,0 +1,35 @@
+#include<stdio.h>
+//判断是否为素数 
+int prime(int m){
+	int i;
+	for(i=2;i<=m/2;i++)
+	  if(m%i==0)
+	    break;
+	if(i>m/2&&m!=1)
+	   return 1;
+	return 0; 
+}
+//寻找素数
+int seekprimes(int m,int n){
+ int i,cnt=0;
+	if(m>n){
+		i=m;
+		m=n;
+		n=i;
+	}
+	for(i=m;i<=n;i++){
+		if(prime(i)){
+			  printf("%d\n",i);
+			  cnt++;
+		}
+		
+	}
+	return cnt;
+} 
+main(){
+	int n,m,cnt;
+	scanf("%d%d",&n,&m);
+	cnt=seekprimes(m,n);
+	printf("共有%d个素数",cnt); 
+	return 0; 
+}
