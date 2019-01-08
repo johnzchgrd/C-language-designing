@@ -27,10 +27,28 @@ void seekprimes(int m,int n){
 		
 	}
 } 
+//将指定区间的数组保存到s[]中 
+void saveprimes(int m,int n,int*s){
+ int i,k=0;
+	if(m>n){
+		i=m;
+		m=n;
+		n=i;
+	}
+	for(i=m;i<=n;i++){
+		if(prime(i)){
+		   s[k]=i;
+		   k++;
+		}
+	}
+}
 main(){
-	int n,m;
+	int n,m,i;
+	int s[501]={0}; 
 	scanf("%d%d",&n,&m);
-    seekprimes(m,n);
-	printf("共有%d个素数,和为%d",cnt,sum); 
+    saveprimes(m,n,s);
+     for(i=0;s[i];i++){
+    	printf("%d\n",s[i]); 
+	 }
 	return 0; 
 }
