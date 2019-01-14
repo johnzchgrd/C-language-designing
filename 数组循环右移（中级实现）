@@ -1,0 +1,27 @@
+#include<stdio.h>
+#include<string.h>
+/*此程序将实现数组循环左移m位
+ *方法难度：中等
+ *复杂度：2*n
+ */
+void reverse(char a[],int s,int t){
+    //函数实现从s开始的n个元素进行倒序排序
+    char tmp;
+    while(s<t){
+        tmp=a[s];
+        a[s++]=a[t];
+        a[t--]=tmp;
+    }
+}
+main(){
+   char s[100]; //数组长度不超过100
+   int n,m;
+   scanf("%s",s);
+   scanf("%d",&m);
+   n=strlen(s);
+   reverse(s,0,n-1);
+   reverse(s,0,m-1);
+   reverse(s,m,n-1);
+   printf("%d\n%s",n,s);
+   return 0;
+}
