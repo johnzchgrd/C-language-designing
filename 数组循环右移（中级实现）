@@ -19,6 +19,7 @@ main(){
    scanf("%s",s);
    scanf("%d",&m);
    n=strlen(s);
+   m %= n;
    reverse(s,0,n-1);
    reverse(s,0,m-1);
    reverse(s,m,n-1);
