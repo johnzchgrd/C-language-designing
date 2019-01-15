@@ -1,0 +1,34 @@
+#include<stdio.h>
+//水仙花数3~7位，8位很慢
+//自定义求整数次幂函数
+mypow(int m,int n){
+    int i,result=m;
+    for(i=1;i<n;i++){
+       result *= m;
+    }
+    return result;
+}
+//判断是否为水仙花数，是返回1，不是返回0
+daffodil(int m,int n){
+    int tmp=m,sum=0;
+    while(tmp){
+        sum+=mypow(tmp%10,n);
+        tmp/=10;
+    }
+    if(sum==m)
+      return 1;
+      else 
+      return 0;
+}
+main(){
+   int n,i;//位数和次幂 
+   
+   scanf("%d",&n);
+   int end =mypow(10,n); //避免重复运算
+   for(i=mypow(10,n-1);i<end;i++){
+       if(daffodil(i,n))
+         printf("%d\n",i);
+   }
+
+   return 0;
+}
