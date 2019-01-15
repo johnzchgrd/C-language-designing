@@ -1,6 +1,6 @@
 void f( char *p ){
   char k[MAXS],*m=k;
-  int i,j;
+  int i=0,j;
   
   while(*p)
     i++,p++; //将p移到末尾
