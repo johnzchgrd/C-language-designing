@@ -12,6 +12,6 @@ main(void){
 	output_student(students);
 	modify(students);
 	output_student(students);
-	
+	system("pause");
 	return 0;
 }

@@ -32,11 +32,11 @@ void output_student(struct student students[]){
 	}
 	printf("编号\t姓名\t数学\t英语\t计算机\t平均值\n");
 	for(i=0;i<Count;i++){
-		printf("%d",students[i].num);
-		printf("%s",students[i].name);
-		printf("%d",students[i].math);
-		printf("%d",students[i].english);
-		printf("%d",students[i].computer);
-		printf("%d",students[i].average);
+		printf("%d\t",students[i].num);
+		printf("%s\t",students[i].name);
+		printf("%d\t",students[i].math);
+		printf("%d\t",students[i].english);
+		printf("%d\t",students[i].computer);
+		printf("%3.2f\n",students[i].average);
 	}
 }
