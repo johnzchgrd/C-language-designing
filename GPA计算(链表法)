@@ -1,0 +1,42 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct course{
+	double jidian;
+	double credit;
+	struct course*next;
+};
+
+main(){
+	struct course*head,*p1,*p2,*p;
+	double jidian,credit,sumofcredit=0,gpa=0;
+	int size=sizeof(struct course);
+	
+	head=NULL;
+	//录入数据
+	while(1){
+		printf("请输入绩点：");
+		scanf("%lf",&jidian);
+		printf("请输入学分：");
+		scanf("%lf",&credit);
+		if(!jidian || !credit)
+		  break;
+		p1=(struct course*)malloc(size);
+		p1->jidian=jidian;
+		p1->credit=credit;
+		sumofcredit+=credit;
+		//增加节点
+		p2=head;
+		head=p1;
+		p1->next=p2;
+	}
+	//计算GPA
+	p=head;
+	while(p!=NULL){
+		gpa+=(p->credit)/sumofcredit*(p->jidian);
+		p=p->next;
+	}
+	printf("\nGPA is %4.2f",gpa);
+	
+	return 0;
+	
+}
