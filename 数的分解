@@ -1,0 +1,18 @@
+#include<stdio.h>
+main(){
+	int n,s[100],len=0;
+    scanf("%10d",&n);//粗略限制输入的大小，防止溢出错误
+    //把n分解
+    int i=0;
+	while(n){
+		s[i++] = n%10;
+		n /= 10;
+		len++;  //统计元素个数
+	}
+	
+	//output
+	for(i=1;i<=len;i++)
+	  printf("%3d",s[len-i]);
+	  
+    return 0;
+}
