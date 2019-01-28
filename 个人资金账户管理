@@ -1,0 +1,132 @@
+/*程序实现功能：
+ *1、新建消费记录
+ *2、查询所有消费记录
+ *3、查询上一次的消费记录
+ *4、数据加密保护（暂未实现）
+ *5、访问权限设置（暂未实现）
+ *6、自动获取日期（暂未实现）
+ *7、自动识别输入格式（暂未实现）
+ */
+
+#include<stdio.h>
+#include<stdlib.h>
+long size;  //保存sizeof(struct Logdata)
+struct Logdata{
+    long logid;   //ID
+    char logdate[11];  ///日期
+    char lognote[15];  //备注
+    double charge;    //费用
+    double  balance;  //余额
+};
+
+//选择操作
+inputchoice(void){
+  int mychoice;
+  printf("\n请选择操作：\n");
+  printf("1-新建记录\n2-消费清单\n3-查询上一次记录\n0-退出程序\n");
+  scanf("%d",&mychoice);
+  return mychoice;
+}
+//获取文件记录总数
+long getLogcount(FILE*cfptr){
+  long begin,end,count;
+  fseek(cfptr,0L,SEEK_SET);
+  begin = ftell(cfptr);
+  fseek(cfptr,0L,SEEK_END);
+  end = ftell(cfptr);
+  count = (end - begin)/size;
+  return count;
+}
+//列出所有就记录
+void listall(FILE*cfptr){
+  struct Logdata log;
+  fseek(cfptr,0L,SEEK_SET);
+  printf("%-6s%-11s%-15s%10s%10s\n","logid","logdate","lognote","charge","balance");
+  while(1){
+    fread(&log,size,1,cfptr);
+    if(feof(cfptr))
+      break;
+    printf("%-6ld%-11s%-15s%10.2lf%10.2lf\n",log.logid,log.logdate,log.lognote,log.charge,log.balance);
+  }
+  }
+  //查询上一条记录
+  void lastlog(FILE*cfptr){
+    struct Logdata log;
+    long count = getLogcount(cfptr);
+    if(count<=0){
+      printf("暂无记录，请新建记录！\n");
+      //return -1;
+    }
+    fseek(cfptr,size*(count-1),SEEK_SET);
+    fread(&log,size,1,cfptr);
+    printf("上一条记录为：\n");
+    printf("%-6s%-11s%-15s%10s%10s\n","logid","logdate","lognote","charge","balance");
+    printf("%-6ld%-11s%-15s%10.2lf%10.2lf\n",log.logid,log.logdate,log.lognote,log.charge,log.balance);
+    //return 0;
+  }
+  //新建记录
+  void newlog(FILE*cfptr){
+    struct Logdata log, lastlog;
+    long count;
+    printf("请输入日期(如2019-01-01)：\n");
+    scanf("%s",log.logdate);
+    printf("请输入备注：\n");
+    scanf("%s",log.lognote);
+    printf("请输入消费额(收入为+，支出为-)：\n");
+    scanf("%lf,&log.charge");
+    count = getLogcount(cfptr);
+
+    if(count>0){
+      fseek(cfptr,size*(count-1),SEEK_SET);
+      fread(&lastlog,size,1,cfptr);
+      log.logid = lastlog.logid + 1;
+      log.balance = log.charge + lastlog.balance;
+    }
+    else{  //初始状态
+      log.logid = 1;
+      log.balance = log.charge;
+    }
+    rewind(cfptr);
+    printf("记录ID为：%ld\n",log.logid);
+    fwrite(&log,size,1,cfptr);
+  }
+
+  //打开文件
+  FILE*openfile(char filename[],char*openmode){
+    FILE*fp;
+    if((fp = fopen(filename,openmode))==NULL){
+      printf("该文件不存在或无法打开！");
+      exit(0);
+    }
+    return fp;
+  }
+
+  main(){
+    FILE*fp;
+    int choice;
+    size = sizeof(struct Logdata);
+    while((choice = inputchoice())!=0){
+      switch(choice){
+        case 1:
+          fp=openfile("cashbox.dat","ab+");
+          newlog(fp);
+          break;
+        case 2:
+          fp=openfile("cashbox.dat","rb");
+          listall(fp);
+          break;
+        case 3:
+          fp=openfile("cashbox.dat","rb");
+          lastlog(fp);
+          break;
+        default:printf("输入错误！");
+      }
+      }
+
+      if(fclose(fp)){
+        printf("无法关闭文件！");
+        exit(0);
+      }
+      return 0;
+
+  }
