@@ -1,0 +1,110 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAXLINELENGTH 200  //最大行长度 
+strsearch( char *s, char *t ){
+   //一般方法查找子串 
+   while(*s){
+   	
+   	char*p=s;
+   	char*m=t;
+     while(*p){
+       if(*p!=*m)
+       break;
+       p++;
+       m++;
+	 }
+    
+    if(*m=='\0')
+      return 1;
+   s++;
+  }
+  return 0;
+}
+void get_a_row(FILE*fp, char buf[]){
+	//读入回车符地读取一行
+    int i=0;
+    while(!feof(fp)){
+    //此处因为不加判断是否到达文件末尾导致多次试验返回值巨大无比，特此注释
+		if((buf[i++]=fgetc(fp))=='\n')
+		  break;
+	}
+    buf[i]='\0';
+   printf("%s",buf);
+}
+FILE*to_row(FILE*fp, char *t){
+	//转到字符串 t 所在行的下一行 
+	char buf[MAXLINELENGTH];
+	FILE*tmp=fp;
+	int flag=0;
+	while(!feof(fp)){
+		get_a_row(fp,buf);
+		if(strsearch(buf,t)&&strsearch(t,buf)) //两个字符串完全相等 
+		   {
+		   flag=1;
+		   break;
+		   }
+	} 
+	if(flag)
+	  return fp;
+	else{
+		printf("\ncannot go to line: %s\n",t);
+		return tmp;
+	}
+	  
+	  
+}
+
+main(){
+	FILE*fp,*fp2;
+	char buf[MAXLINELENGTH];
+	static char filename[20];
+	char s[20],t[20];
+	//获取文件名
+	 printf("filename:\n");
+	 scanf("%s",filename);
+	//打开文件
+	if((fp=fopen(filename,"r"))==NULL){
+		printf("cannot open \"%s\"!",filename);
+		exit(1);
+	}
+	if((fp2=fopen("output.vcf","w"))==NULL){
+		printf("cannot create \"output.vcf\"!");
+		exit(2);
+	}
+	//测试部分
+	//char s[]="PHOTO;",t[]="\n";
+	/*fp=to_row(fp,t); 
+	while(!feof(fp)){
+		get_a_row(fp,buf);
+	}
+    
+    */
+    /*scanf("%s\n%s",s,t); 
+    if(strsearch(s,t))
+      printf("find!");
+    else
+      printf("not find!");
+      */
+    
+    //删除PHOTO段 
+    while(!feof(fp)){
+		get_a_row(fp,buf);
+		if(strsearch(buf,"PHOTO;"))
+		   fp=to_row(fp,"\n");
+		else
+		   fputs(buf,fp2);	
+	}
+	//关闭文件
+	if(fclose(fp)){
+		printf("cannot close \"%s\"!",filename);
+		exit(3);
+	}
+	if(fclose(fp2)){
+		printf("cannot close \"output.vcf\"!");
+		exit(4);
+	}
+	
+	return 0;
+}
+
