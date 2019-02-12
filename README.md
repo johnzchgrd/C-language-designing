@@ -1,5 +1,5 @@
 # Just a MEMO
-## 1、相互包含问题（https://bbs.csdn.net/topics/20196917）
+## 1、相互包含问题（ https://bbs.csdn.net/topics/20196917 ）
 互相包含是允许的，为了防止编译时的错误，所以有#pragma once这样的声明，
 无论头文件被包含多少次，都只编译1次，
 只要在头文件中加上这一行就可以随意互相包含了，
