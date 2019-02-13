@@ -72,10 +72,17 @@ void deletepara(FILE*fp,FILE*fp2,char*startflag,char*endflag){
 	  printf("Deletion finished!\n");
 }
 main(){
-	FILE*fp,*fp2,*tmp,*tmp1;
+	FILE*fp,*fp2;
 	long position=0;//保存文件指针位置 
 	char buf[MAXLINELENGTH];
 	static char filename[20];
+	int count=0;
+	//定义单向链表，用于保存联系人信息 
+	struct contact{
+		char name[20];//姓名 
+		char tel[12],tel1[12],tel2[12];//电话 
+		struct contact *next;//指向下一个联系人节 
+	} *p,*tmp;
 	//获取文件名
 	 printf("filename:\n");
 	 scanf("%s",filename);
@@ -94,7 +101,7 @@ main(){
 	char s[]="PHOTO;",t[]="\n";
 	deletepara(fp,fp2,s,t);
 	*/
-	
+	/*
 	//识别单个联系人测试
 	position=ftell(fp); 
 	
@@ -109,6 +116,50 @@ main(){
 		   }
 	   }
 	
+    if(fseek(fp,position,SEEK_SET)){
+    	printf("cannot return to previous paragraph!\n");
+    	exit(5);
+	}
+	*/
+	
+	//读取单个联系人信息 
+	position=ftell(fp); 
+	if((p=(struct contact*)malloc(sizeof(struct contact)))==NULL){
+		printf("cannot allocate memory!");
+		exit(6);
+	}
+	get_a_row(fp,buf);
+	//核心判断语句 
+	if(strsearch(buf,"BEGIN:")==buf)
+	   while(1){
+	   	get_a_row(fp,buf);
+	   	if(strsearch(buf,"FN:")==buf){
+	   		sscanf(buf,"FN:%s",p->name);
+		   }
+		if(strsearch(buf,"TEL;")==buf){
+	   		switch(count){
+	   			case 0:
+				   sscanf(buf,"%*[^:]:%s",p->tel);
+	   			   count++;
+	   			   break;
+	   			case 1:
+	   				sscanf(buf,"%*[^:]:%s",p->tel1);
+	   				count++;
+	   				break;
+	   			case 2:
+	   				sscanf(buf,"%*[^:]:%s",p->tel2);
+	   				count++;
+	   				break;
+			   }
+		   }
+	   	if(strsearch(buf,"END:")==buf)
+	   	   break; 
+	   }
+	   //test
+	   printf("%-10s%-15s%-15s%-15s\n","姓名","电话1","电话2","电话3"); 
+	   printf("%-10s%-15s%-15s%-15s",p->name,p->tel,p->tel1,p->tel2);
+
+	free(p);
     if(fseek(fp,position,SEEK_SET)){
     	printf("cannot return to previous paragraph!\n");
     	exit(5);
