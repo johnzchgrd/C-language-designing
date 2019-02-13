@@ -1,0 +1,107 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define MAXLINELENGTH 200  //最大行长度 建议>=200 
+strsearch( char *s, char *t ){
+   //一般方法查找子串 
+   while(*s){
+   	
+   	char*p=s;
+   	char*m=t;
+     while(*p){
+       if(*p!=*m)
+       break;
+       p++;
+       m++;
+	 }
+    
+    if(*m=='\0')
+      return 1;//匹配到字符串 
+   s++;
+  }
+  return 0;//未匹配到字符串 
+}
+void get_a_row(FILE*fp, char buf[]){
+	//读入回车符地读取一行
+    int i=0;
+    while(!feof(fp)){
+		if((buf[i++]=fgetc(fp))=='\n')
+		  break;
+	}
+    buf[i]='\0';
+   //测试用printf("%s",buf);
+}
+FILE*to_row(FILE*fp, char *t){
+	//转到字符串 t 所在行的下一行 
+	char buf[MAXLINELENGTH];
+	FILE*tmp=fp;
+	int flag=0;
+	while(!feof(fp)){
+		get_a_row(fp,buf);
+		if(strsearch(buf,t)&&strsearch(t,buf)) //两个字符串完全相等 
+		   {
+		   flag=1;
+		   break;
+		   }
+	} 
+	if(flag)
+	  return fp;
+	else{
+		printf("\ncannot go to the line after \"%s\"\n",t);
+		return tmp;
+	}
+		
+}
+void deletepara(FILE*fp,FILE*fp2,char*startflag,char*endflag){
+	//(demo)删除指定段:从startflag开始，到（包括）endflag为止，endflag必须为完整的结束行 
+	char buf[MAXLINELENGTH];
+	//char startflag[MAXLINELENGTH],endflag[MAXLINELENGTH];
+	/*printf("Enter STARTFLAG:\n");
+	scanf("%s",startflag);
+	printf("Enter ENDROW:(must be an entire row)\n");
+	scanf("%s",endflag);
+	*/
+	while(!feof(fp)){
+		get_a_row(fp,buf);
+		if(strsearch(buf,startflag))
+		   fp=to_row(fp,endflag);
+		else
+		   fputs(buf,fp2);				
+	}
+	if(feof(fp))
+	  printf("Deletion finished!\n");
+}
+main(){
+	FILE*fp,*fp2,*tmp,*tmp1;
+	char buf[MAXLINELENGTH];
+	static char filename[20];
+	//获取文件名
+	 printf("filename:\n");
+	 scanf("%s",filename);
+	//打开文件
+	if((fp=fopen(filename,"r"))==NULL){
+		printf("cannot open \"%s\"!",filename);
+		exit(1);
+	}
+	if((fp2=fopen("output.vcf","w"))==NULL){
+		printf("cannot create \"output.vcf\"!");
+		exit(2);
+	}
+	//核心部分
+	char s[]="PHOTO;",t[]="\n";
+	deletepara(fp,fp2,s,t);
+    
+    
+    
+	//关闭文件
+	if(fclose(fp)){
+		printf("cannot close \"%s\"!",filename);
+		exit(3);
+	}
+	if(fclose(fp2)){
+		printf("cannot close \"output.vcf\"!");
+		exit(4);
+	}
+	return 0;
+}
+
