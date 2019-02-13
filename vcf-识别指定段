@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #define MAXLINELENGTH 200  //最大行长度 建议>=200 
-strsearch( char *s, char *t ){
+char* strsearch( char *s, char *t ){
    //一般方法查找子串 
    while(*s){
    	
@@ -16,10 +16,10 @@ strsearch( char *s, char *t ){
 	 }
     
     if(*m=='\0')
-      return 1;//匹配到字符串 
+      return s;//匹配到字符串 
    s++;
   }
-  return 0;//未匹配到字符串 
+  return NULL;//未匹配到字符串 
 }
 void get_a_row(FILE*fp, char buf[]){
 	//读入回车符地读取一行
@@ -38,7 +38,7 @@ FILE*to_row(FILE*fp, char *t){
 	int flag=0;
 	while(!feof(fp)){
 		get_a_row(fp,buf);
-		if(strsearch(buf,t)&&strsearch(t,buf)) //两个字符串完全相等 
+		if(strsearch(buf,t)!=NULL&&strsearch(t,buf)!=NULL) //两个字符串完全相等 
 		   {
 		   flag=1;
 		   break;
@@ -63,7 +63,7 @@ void deletepara(FILE*fp,FILE*fp2,char*startflag,char*endflag){
 	*/
 	while(!feof(fp)){
 		get_a_row(fp,buf);
-		if(strsearch(buf,startflag))
+		if(strsearch(buf,startflag)!=NULL)
 		   fp=to_row(fp,endflag);
 		else
 		   fputs(buf,fp2);				
@@ -73,6 +73,7 @@ void deletepara(FILE*fp,FILE*fp2,char*startflag,char*endflag){
 }
 main(){
 	FILE*fp,*fp2,*tmp,*tmp1;
+	long position=0;//保存文件指针位置 
 	char buf[MAXLINELENGTH];
 	static char filename[20];
 	//获取文件名
@@ -88,9 +89,30 @@ main(){
 		exit(2);
 	}
 	//核心部分
+	/*
+	//删除PHOTO段测试 
 	char s[]="PHOTO;",t[]="\n";
 	deletepara(fp,fp2,s,t);
-    
+	*/
+	
+	//识别单个联系人测试
+	position=ftell(fp); 
+	
+	get_a_row(fp,buf);
+	if(strsearch(buf,"BEGIN:")==buf)
+	   while(1){
+	   	printf("%s",buf);
+	   	get_a_row(fp,buf);
+	   	if(strsearch(buf,"END:")==buf){
+	   		printf("%s",buf);
+	   		break;
+		   }
+	   }
+	
+    if(fseek(fp,position,SEEK_SET)){
+    	printf("cannot return to previous paragraph!\n");
+    	exit(5);
+	}
     
     
 	//关闭文件
