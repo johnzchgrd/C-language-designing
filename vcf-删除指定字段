@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#define MAXLINELENGTH 200  //最大行长度 
+#define MAXLINELENGTH 200  //最大行长度 建议>=200 
 strsearch( char *s, char *t ){
    //一般方法查找子串 
    while(*s){
@@ -16,21 +16,20 @@ strsearch( char *s, char *t ){
 	 }
     
     if(*m=='\0')
-      return 1;
+      return 1;//匹配到字符串 
    s++;
   }
-  return 0;
+  return 0;//未匹配到字符串 
 }
 void get_a_row(FILE*fp, char buf[]){
 	//读入回车符地读取一行
     int i=0;
     while(!feof(fp)){
-    //此处因为不加判断是否到达文件末尾导致多次试验返回值巨大无比，特此注释
 		if((buf[i++]=fgetc(fp))=='\n')
 		  break;
 	}
     buf[i]='\0';
-   printf("%s",buf);
+   //测试用printf("%s",buf);
 }
 FILE*to_row(FILE*fp, char *t){
 	//转到字符串 t 所在行的下一行 
@@ -48,18 +47,26 @@ FILE*to_row(FILE*fp, char *t){
 	if(flag)
 	  return fp;
 	else{
-		printf("\ncannot go to line: %s\n",t);
+		printf("\ncannot go to the line after \"%s\"\n",t);
 		return tmp;
 	}
-	  
-	  
+		
 }
-
+void deletepara(FILE*fp,FILE*fp2,char*startflag, char*endflag){
+	//删除指定段:从startflag开始，到（包括）endflag为止，endflag必须为完整的结束行 
+	char buf[MAXLINELENGTH];
+	while(!feof(fp)){
+		get_a_row(fp,buf);
+		if(strsearch(buf,startflag))
+		   fp=to_row(fp,endflag);
+		else
+		   fputs(buf,fp2);				
+	}
+}
 main(){
-	FILE*fp,*fp2;
+	FILE*fp,*fp2,*tmp,*tmp1;
 	char buf[MAXLINELENGTH];
 	static char filename[20];
-	char s[20],t[20];
 	//获取文件名
 	 printf("filename:\n");
 	 scanf("%s",filename);
@@ -72,29 +79,12 @@ main(){
 		printf("cannot create \"output.vcf\"!");
 		exit(2);
 	}
-	//测试部分
-	//char s[]="PHOTO;",t[]="\n";
-	/*fp=to_row(fp,t); 
-	while(!feof(fp)){
-		get_a_row(fp,buf);
-	}
+	//核心部分
+	char s[]="PHOTO;",t[]="\n";
+	deletepara(fp,fp2,s,t);
     
-    */
-    /*scanf("%s\n%s",s,t); 
-    if(strsearch(s,t))
-      printf("find!");
-    else
-      printf("not find!");
-      */
     
-    //删除PHOTO段 
-    while(!feof(fp)){
-		get_a_row(fp,buf);
-		if(strsearch(buf,"PHOTO;"))
-		   fp=to_row(fp,"\n");
-		else
-		   fputs(buf,fp2);	
-	}
+    
 	//关闭文件
 	if(fclose(fp)){
 		printf("cannot close \"%s\"!",filename);
@@ -104,7 +94,6 @@ main(){
 		printf("cannot close \"output.vcf\"!");
 		exit(4);
 	}
-	
 	return 0;
 }
 
