@@ -2,6 +2,24 @@
 #include<stdlib.h>
 #include<string.h>
 #define MAXLINELENGTH 200  //最大行长度 建议>=200 
+/*
+ *author: https://github.com/johnzchgrd
+ *date: 2019.2
+ *support-vcf-version: 3.0
+ *functions: 
+ *1、删除指定段 * 
+ *2、识别联系人信息并显示 * 
+ *3、联系人去空、乱码（格式控制） 
+ *4、合并重复联系人
+ *5、功能3、4输出为.vcf文件 
+ *6、功能2实现一页一页显示 
+ */ 
+struct contact{
+		int id;
+		char name[30];//姓名 
+	    char tel[12],tel1[12],tel2[12],tel3[12];//电话1，2，3，4 
+		struct contact *next;//指向下一个联系人节 
+	}; 
 char* strsearch( char *s, char *t ){
    //一般方法查找子串 
    while(*s){
@@ -71,18 +89,96 @@ void deletepara(FILE*fp,FILE*fp2,char*startflag,char*endflag){
 	if(feof(fp))
 	  printf("Deletion finished!\n");
 }
+void scan_a_person(FILE*fp,struct contact *p){
+	char buf[MAXLINELENGTH];
+	int count;
+	//long position=ftell(fp); //保存文件指针位置 
+	get_a_row(fp,buf);//读取一行 
+	if(strsearch(buf,"BEGIN:")==buf)//识别名片开头 
+	{
+	   count=0;
+	   get_a_row(fp,buf);
+	   while(strsearch(buf,"END:")!=buf){
+	   	
+	   	if(strsearch(buf,"FN:")==buf){
+	   		sscanf(buf,"FN:%s",p->name);
+		   }
+		if(strsearch(buf,"TEL;TYPE=")==buf)
+	   		switch(count){
+	   			case 0:
+				   sscanf(buf,"%*[^:]:%[0-9| ]s",p->tel);
+	   			   count++;
+	   			   break;
+	   			case 1:
+	   				sscanf(buf,"%*[^:]:%[0-9| ]s",p->tel1);
+	   				count++;
+	   				break;
+	   			case 2:
+	   				sscanf(buf,"%*[^:]:%[0-9| ]s",p->tel2);
+	   				count++;
+	   				break;
+	   			case 3:
+	   				sscanf(buf,"%*[^:]:%[0-9| ]s",p->tel3);
+	   				count++;
+	   				break;
+	   			default:
+				   printf("Too many telephones for %s!\n",p->name);
+				   //exit(6);
+			   }
+			  
+		   
+		    get_a_row(fp,buf);
+	   }
+	} 
+	   
+	/*if(fseek(fp,position,SEEK_SET)){
+    	printf("cannot return to previous position!\n");
+    	exit(5);
+	}
+	*/
+}
+struct contact* daoru(FILE*fp){
+	//导入vcf文件中的所有联系人,返回首地址 
+	int id=0;
+	char choice;
+	struct contact *p,*tmp,*head=NULL;
+				
+	while(!feof(fp)){
+				
+			//动态分配内存 
+			if((p=(struct contact*)malloc(sizeof(struct contact)))==NULL){
+				printf("cannot allocate memory!");
+				exit(6);
+			}
+			//初始化全为'\0'，有一定影响 
+			
+			memset(p->tel, 0, 12);
+			memset(p->tel1, 0, 12);
+			memset(p->tel2, 0, 12);
+			memset(p->tel3, 0, 12);
+			
+			id++;
+			/*if(id==1)
+				head=tmp;
+				*/
+			//***倒序***存放联系人 
+			tmp=head;
+			scan_a_person(fp,p);//读取单个联系人信息 
+			p->id=id;
+			p->next=tmp;
+			head=p;
+		}
+
+	  
+	  return head;
+}
 main(){
 	FILE*fp,*fp2;
-	long position=0;//保存文件指针位置 
+	long position=0;
 	char buf[MAXLINELENGTH];
 	static char filename[20];
-	int count=0;
-	//定义单向链表，用于保存联系人信息 
-	struct contact{
-		char name[20];//姓名 
-		char tel[12],tel1[12],tel2[12];//电话 
-		struct contact *next;//指向下一个联系人节 
-	} *p,*tmp;
+	//定义循环链表，用于保存联系人信息 
+	struct contact *p,*tmp,*head=NULL;
 	//获取文件名
 	 printf("filename:\n");
 	 scanf("%s",filename);
@@ -91,11 +187,12 @@ main(){
 		printf("cannot open \"%s\"!",filename);
 		exit(1);
 	}
-	if((fp2=fopen("output.vcf","w"))==NULL){
-		printf("cannot create \"output.vcf\"!");
+	if((fp2=fopen("read_output.txt","w"))==NULL){
+		printf("cannot create \"read_output.txt\"!");
 		exit(2);
 	}
 	//核心部分
+	
 	/*
 	//删除PHOTO段测试 
 	char s[]="PHOTO;",t[]="\n";
@@ -122,57 +219,43 @@ main(){
 	}
 	*/
 	
-	//读取单个联系人信息 
-	position=ftell(fp); 
-	if((p=(struct contact*)malloc(sizeof(struct contact)))==NULL){
-		printf("cannot allocate memory!");
-		exit(6);
-	}
-	get_a_row(fp,buf);
-	//核心判断语句 
-	if(strsearch(buf,"BEGIN:")==buf)
-	   while(1){
-	   	get_a_row(fp,buf);
-	   	if(strsearch(buf,"FN:")==buf){
-	   		sscanf(buf,"FN:%s",p->name);
-		   }
-		if(strsearch(buf,"TEL;")==buf){
-	   		switch(count){
-	   			case 0:
-				   sscanf(buf,"%*[^:]:%s",p->tel);
-	   			   count++;
-	   			   break;
-	   			case 1:
-	   				sscanf(buf,"%*[^:]:%s",p->tel1);
-	   				count++;
-	   				break;
-	   			case 2:
-	   				sscanf(buf,"%*[^:]:%s",p->tel2);
-	   				count++;
-	   				break;
-			   }
-		   }
-	   	if(strsearch(buf,"END:")==buf)
-	   	   break; 
-	   }
-	   //test
-	   printf("%-10s%-15s%-15s%-15s\n","姓名","电话1","电话2","电话3"); 
-	   printf("%-10s%-15s%-15s%-15s",p->name,p->tel,p->tel1,p->tel2);
-
-	free(p);
-    if(fseek(fp,position,SEEK_SET)){
-    	printf("cannot return to previous paragraph!\n");
-    	exit(5);
-	}
+	//导入所有联系人测试 
+	//head=daoru(fp,fp2); 
+	head=daoru(fp);
+	//显示在屏幕上 
+		if(fp2==NULL){
+			printf("%-6s%-30s%30s%30s%30s%30s\n","编号","姓名","电话1","电话2","电话3","电话4"); 
+			p=head;
+			while(p!=NULL){
+			   	printf("%-6d%-30s%30s%30s%30s%30s\n",p->id,p->name,p->tel,p->tel1,p->tel2,p->tel3);
+			   	tmp=p->next;
+			    free(p);
+			    p=tmp;
+			 }
+		}
+		//输出到文件
+		else{
+			p=head;
+			while(p!=NULL){
+			   	fprintf(fp2,"%04d  %s；%s；%s；%s；%s\n",p->id,p->name,p->tel,p->tel1,p->tel2,p->tel3);
+			   	tmp=p->next;
+			    free(p);
+			    p=tmp;
+		  } 
+		} 
+	
+		
+	
     
     
+    //system("pause"); 
 	//关闭文件
 	if(fclose(fp)){
 		printf("cannot close \"%s\"!",filename);
 		exit(3);
 	}
 	if(fclose(fp2)){
-		printf("cannot close \"output.vcf\"!");
+		printf("cannot close \"read_output.txt\"!");
 		exit(4);
 	}
 	return 0;
