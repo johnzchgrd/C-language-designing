@@ -13,11 +13,17 @@
  *4、合并重复联系人
  *5、功能3、4输出为.vcf文件 
  *6、功能2实现一页一页显示 
+ *7、支持version 2.1和version 3.0转换（quoted-printable编码） 
+ *8、支持修改单个联系人信息并保存到文件 
+ *9、功能1能做到智能识别有多少种段并以选项形式呈现 
+ *10、整合与拆分联系人
+ *
+ * 
  */ 
 struct contact{
 		int id;
-		char name[30];//姓名 
-	    char tel[12],tel1[12],tel2[12],tel3[12];//电话1，2，3，4 
+		char name[31];//姓名 
+	    char tel[12],a,tel1[12],b,tel2[12],c,tel3[12];//电话1，2，3，4 ，插入a,b,c原理未知，不过可以防止（应该是）sscanf函数的副作用 
 		struct contact *next;//指向下一个联系人节 
 	}; 
 char* strsearch( char *s, char *t ){
@@ -106,7 +112,7 @@ void scan_a_person(FILE*fp,struct contact *p){
 		if(strsearch(buf,"TEL;TYPE=")==buf)
 	   		switch(count){
 	   			case 0:
-				   sscanf(buf,"%*[^:]:%[0-9| ]s",p->tel);
+				   sscanf(buf,"%*[^:]:%[0-9| ]s",p->tel);//正则表达式，表示读到冒号后读入冒号后的空格或数字 
 	   			   count++;
 	   			   break;
 	   			case 1:
@@ -122,7 +128,11 @@ void scan_a_person(FILE*fp,struct contact *p){
 	   				count++;
 	   				break;
 	   			default:
-				   printf("Too many telephones for %s!\n",p->name);
+	   			   if(count>=4)
+				     {
+				     	printf("%s has too many telephone numbers!\n",p->name);
+				     	return;
+					 }
 				   //exit(6);
 			   }
 			  
@@ -150,12 +160,12 @@ struct contact* daoru(FILE*fp){
 				printf("cannot allocate memory!");
 				exit(6);
 			}
-			//初始化全为'\0'，有一定影响 
+			//初始化全为'\0'，有一定影响，未知原因 
 			
-			memset(p->tel, 0, 12);
-			memset(p->tel1, 0, 12);
-			memset(p->tel2, 0, 12);
-			memset(p->tel3, 0, 12);
+			memset(p->tel, 0, 12*sizeof(char));
+			memset(p->tel1, 0, 12*sizeof(char));
+			memset(p->tel2, 0, 12*sizeof(char));
+			memset(p->tel3, 0, 12*sizeof(char));
 			
 			id++;
 			/*if(id==1)
@@ -175,8 +185,9 @@ struct contact* daoru(FILE*fp){
 main(){
 	FILE*fp,*fp2;
 	long position=0;
+	int choice=-1,printflag=0;
 	char buf[MAXLINELENGTH];
-	static char filename[20];
+	static char filename[50];
 	//定义循环链表，用于保存联系人信息 
 	struct contact *p,*tmp,*head=NULL;
 	//获取文件名
@@ -222,29 +233,40 @@ main(){
 	//导入所有联系人测试 
 	//head=daoru(fp,fp2); 
 	head=daoru(fp);
-	//显示在屏幕上 
-		if(fp2==NULL){
-			printf("%-6s%-30s%30s%30s%30s%30s\n","编号","姓名","电话1","电话2","电话3","电话4"); 
-			p=head;
-			while(p!=NULL){
-			   	printf("%-6d%-30s%30s%30s%30s%30s\n",p->id,p->name,p->tel,p->tel1,p->tel2,p->tel3);
-			   	tmp=p->next;
-			    free(p);
-			    p=tmp;
-			 }
-		}
-		//输出到文件
-		else{
-			p=head;
-			while(p!=NULL){
-			   	fprintf(fp2,"%04d  %s；%s；%s；%s；%s\n",p->id,p->name,p->tel,p->tel1,p->tel2,p->tel3);
-			   	tmp=p->next;
-			    free(p);
-			    p=tmp;
-		  } 
-		} 
-	
+	while(!printflag){
+		printf("Enter choice:[1.print on the screen | 2 write to file]\n");
+		scanf("%d",&choice);  //此处有bug，输入英文会进入死循环 
+		switch(choice){
+			case 1://显示在屏幕上 
+				printf("%-6s%-32s%27s%27s%27s%27s\n","编号","姓名","电话1","电话2","电话3","电话4"); 
+				p=head;
+				while(p!=NULL){
+				   	printf("%-6d%-32s%27s%27s%27s%27s\n",p->id,p->name,p->tel,p->tel1,p->tel2,p->tel3);
+				   	tmp=p->next;
+				    free(p);
+				    p=tmp;
+				 }
+				printflag=1;
+				break;
+			
+			case 2://输出到文件
+				p=head;
+				while(p!=NULL){
+				   	fprintf(fp2,"%04d;%s;%s;%s;%s;%s\n",p->id,p->name,p->tel,p->tel1,p->tel2,p->tel3);
+				   	tmp=p->next;
+				    free(p);
+				    p=tmp;
+			  } 
+			  printf("\nWrite to file completed!\n");
+			  printflag=1;
+				break;
+			default:
+			    printf("Invalid number!\n");
+			    printflag=0;
 		
+		}
+	
+	} 
 	
     
     
