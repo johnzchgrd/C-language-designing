@@ -1,0 +1,8 @@
+void printdigits( int n ){
+  int num;
+  num=n%10;
+  n/=10;
+  if(n)
+  printdigits(n);
+  printf("%d\n",num);//一行输出一个
+}
