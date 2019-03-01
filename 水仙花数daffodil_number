@@ -1,6 +1,7 @@
 #include<stdio.h>
 //水仙花数3~7位，8位很慢
 //自定义求整数次幂函数
+//循环实现
 mypow(int m,int n){
     int i,result=m;
     for(i=1;i<n;i++){
@@ -8,6 +9,13 @@ mypow(int m,int n){
     }
     return result;
 }
+/*
+//递归实现
+mypow(int m,int n){
+    if(!n) return 1;
+    else return m*mypow(m,n-1);
+}
+*/
 //判断是否为水仙花数，是返回1，不是返回0
 daffodil(int m,int n){
     int tmp=m,sum=0;
