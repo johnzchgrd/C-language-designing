@@ -1,0 +1,13 @@
+int search(int n){
+  int count=0;
+  int i,n1,n2,n3;
+  int end=sqrt(n);
+  for(i=11;i<=end;i++){
+    n1=i*i%10;
+    n2=(i*i/10)%10;
+    n3=i*i/100;
+    if(n1==n2||n1==n3||n2==n3)
+      count++;
+  }
+  return count;
+}
