@@ -24,7 +24,7 @@ char *search( char *s, char *t ){
      char*m=t;
      while(*p){
        if(*p!=*m)
-       break;
+          break;
        p++;
        m++;
      }
