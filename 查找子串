@@ -20,19 +20,17 @@ int main()
 char *search( char *s, char *t ){
    
    while(*s){
-   	
-   	char*p=s;
-   	char*m=t;
+     char*p=s;
+     char*m=t;
      while(*p){
        if(*p!=*m)
        break;
        p++;
        m++;
-	 }
-    
+     }
     if(*m==0)
-   return s;
-   s++;
+       return s;
+    s++;
   }
   return NULL;
 }
