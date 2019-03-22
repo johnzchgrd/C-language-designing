@@ -1,0 +1,32 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+main(){
+	char *list[20],str[11],*tmp;
+	int i,len,j;
+	//generate
+	scanf("%s",str);
+	while(str[0]!='#'){
+		list[i] = (char*)malloc(sizeof(char)*(strlen(str)+1));
+		strcpy(list[i],str);
+		i++;
+		scanf("%s",str);
+	}
+	len = i;
+	//compare-maopaopaixu
+	for(i=1;i<len;i++)
+	  for(j=0;j<len-i;j++){
+	  	if(strlen(list[j])>strlen(list[j+1])){
+	  		//swap
+	  		tmp=list[j+1];
+	  		list[j+1]=list[j];
+	  		list[j]=tmp;
+		  } 
+	  }
+	//output
+	for(i=0;i<len;i++){
+	  printf("%s ",list[i]);
+	  free(list[i]);
+	}
+	return 0;
+}
