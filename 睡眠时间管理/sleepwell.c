@@ -1,87 +1,40 @@
-/*ç¨‹åºå®ç°åŠŸèƒ½ï¼š
- *1ã€æ–°å»ºç¡çœ æ—¶é—´è®°å½•*
- *2ã€æŸ¥è¯¢æ‰€æœ‰ç¡çœ æ—¶é—´è®°å½•*
- *3ã€åˆ¤æ–­æœ€è¿‘ä¸€å‘¨çš„ç¡çœ æ—¶é—´æ˜¯å¦è¾¾æ ‡ 
- *4ã€æ•°æ®åŠ å¯†ä¿æŠ¤->åŠ å¯†ç®—æ³• 
- *5ã€å¯¹æ—¥æœŸè¿›è¡Œæ’åº
- *6ã€æ”¯æŒä¿®æ”¹ç‰¹å®šæ—¥æœŸæˆ–ç¼–å·çš„è®°å½• 
- *7ã€åˆ·æ–°æ•°æ® 
- *8ã€è‡ªåŠ¨è®¡ç®—ç¡çœ æ—¶é—´
- *9ã€æ™ºèƒ½è¯†åˆ«è¾“å…¥æ ¼å¼
+/*³ÌĞòÊµÏÖ¹¦ÄÜ£º
+ *1¡¢ĞÂ½¨Ë¯ÃßÊ±¼ä¼ÇÂ¼*
+ *2¡¢²éÑ¯ËùÓĞË¯ÃßÊ±¼ä¼ÇÂ¼*
+ *3¡¢ÅĞ¶Ï×î½üÒ»ÖÜµÄË¯ÃßÊ±¼äÊÇ·ñ´ï±ê   <35?  flag
+ *4¡¢Êı¾İ¼ÓÃÜ±£»¤->¼ÓÃÜËã·¨ 
+ *5¡¢¶ÔÈÕÆÚ½øĞĞÅÅĞò
+ *6¡¢Ö§³ÖĞŞ¸ÄÌØ¶¨±àºÅµÄ¼ÇÂ¼* 
+ *7¡¢Ë¢ĞÂÊı¾İ*
+ *8¡¢×Ô¶¯¼ÆËãË¯ÃßÊ±¼ä(¿É½è¼øÖ®Ç°µÄ´úÂë--Ò»ÌìÖ®ÄÚÁ½Ê±¼äÖ®²î£¬ÊäÈëÁ½¸ö4Î»Êı£¬²»¹ıĞèÒªÓÅ»¯)
+ *9¡¢ÖÇÄÜÊ¶±ğÊäÈë¸ñÊ½£¨ÈÕÆÚÊÇ·ñ´æÔÚµÈ£© 
+ *10¡¢ÈÕ¼äÄ£Ê½/Ò¹¼äÄ£Ê½×ª»»* 
+ *11¡¢Éú³É´´½¨Ê±¼äºÍĞŞ¸ÄÊ±¼ä getdateº¯Êı£¬·µ»Ø20190304£¨intÀàĞÍ£©
+ *12¡¢Ö§³ÖÖØÔØÎÄ¼ş 
+ *13¡¢Ö§³Ö¸ü¸ÄÖÜÆÚ
+ *14¡¢¹¦ÄÜ10µÄ×Ô¶¯×ª»»
  */
  
  /*
   *author: Johnzchgrd
   *
-  *date: 2019/03/05
+  *create-date: 2019/03/05
   *
   */
 
-#include"sleep.h"
-#include"fileio.c" 
-#include"basiclib.c"
-#include"create_new.c" 
-#include"list.c"
 
-/*
-//å…·ä½“ä¿®æ”¹ç¨‹åº
-void make_right(FILE* dfptr, long offset){
-	fseek(dfptr, offset,SEEK_SET);
-	
-}
-//éå†åˆ·æ–°weeklysum
- */
-//ä¿®æ”¹æŒ‡å®šç¼–å·è®°å½•
-void correction(FILE* dfptr){
-	int wrongid,idfindflag=0;
-	FILE* tmpnew;
-	struct sleepdata sleep,*newsleep;
-	printf("Enter the ID of the data you want to correct:\n");
-	scanf("%d",&wrongid);
-	newsleep = (struct sleepdata*)malloc(sizeof(struct sleepdata));
-	fseek(dfptr,0L,SEEK_SET);
-	while(!feof(dfptr)){
-		fread(&sleep,size,1,dfptr);
-		
-		if(sleep.logid==wrongid)
-		{
-			
-		    createNewStructTo(newsleep);
-		    newsleep->logid = sleep.logid;
-		    
-		    fseek(dfptr,0L,SEEK_SET);
-		    tmpnew = openfile("b.dat","wb+");
-			while(1) {
-				fread(&sleep,size,1,dfptr);
-				if(feof(dfptr))
-				 break;
-				if(sleep.logid == wrongid){
-					fwrite(newsleep,size,1,tmpnew);
-				}
-				else{
-					fwrite(&sleep,size,1,tmpnew);
-				}
-			}
-			
-			closefile(tmpnew);
-			free(newsleep);
-			idfindflag=1;
-			printf("Corrcetion finished!\n");
-			break;
-		}
-	}
-	if(idfindflag==0)
-	  printf("No ID: %d found!\n",wrongid);
-	  
-} 
+
+#include"sleep.h" 
 
 main(){
   FILE*fp;
-  int choice;//é€‰é¡¹ 
-  char filename[11];//æ–‡ä»¶è·¯å¾„é•¿åº¦æœ€å¤§ä¸º11 
+  int choice;//Ñ¡Ïî 
+  int IDfortest;//²âÊÔÓÃ 
+  char filename[MAXFILENAMELEN], *today_in_hhmmss[20];
+  printf("Today is:%s\n",getTimenow_str(today_in_hhmmss));
   printf("Enter file for data storage:\n");
-  scanf("%11s",filename);
-  
+  scanf_s("%s", filename, MAXFILENAMELEN);
+
   while((choice = inputchoice())!=0){
     switch(choice){
       case 1:
@@ -95,12 +48,32 @@ main(){
         closefile(fp);
         break;
       case 3:
-      	fp=openfile(filename,"rb+");
+      	fp=openfile(filename,"rb+");//need to change open mode for merging
         correction(fp);
         closefile(fp);
         break;
+      case 4:
+      	fp=openfile(filename,"rb");
+        fresh(fp);
+        closefile(fp);
+        break;
+      case 5:
+	    printf("Enter new filename:\n");
+        scanf_s("%s",filename,MAXFILENAMELEN);
+        break;
+      case 6://²âÊÔÓÃ½Ó¿Ú 
+      	fp=openfile(filename,"rb");
+		getprevHours_test(fp,IDfortest);
+        closefile(fp);
+        break;
+      case 7:
+	    system("color f0"); //ÈÕ¼ä 
+	    break;
+	  case 8:
+	  	system("color 07"); //Ò¹¼ä 
+	  	break;
       default:
-    printf("Invalid input!\n");
+        printf("Invalid input!\n");
     }
     }
     

@@ -1,11 +1,35 @@
+//#pragma once
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
+#include<windows.h>
 
+#define MAXFILENAMELEN 100  //ÎÄ¼şÂ·¾¶×î´ó³¤¶È
 struct sleepdata{
-	int logid;//ç¼–å·
-	char date[11];//æ—¥æœŸ
-	double in_hour;//ä»¥å°æ—¶è®¡
-	double period;//ä»¥ç¡çœ å‘¨æœŸè®¡
-	double sum7days;//7å¤©æ€»ç¡çœ å‘¨æœŸ
+	int logid;//±àºÅ
+	char date[11];//ÈÕÆÚ
+	double in_hour;//ÒÔĞ¡Ê±¼Æ
+	double period;//ÒÔË¯ÃßÖÜÆÚ¼Æ
+	double sum7days;//7Ìì×ÜË¯ÃßÖÜÆÚ
+	char create_date[20];//±£´æ´´½¨Ê±¼ä
+	double tmp,tmp1,tmp2,tmp3;//ÔİÊ±Î´Ïëµ½µÄ--Ô¤Áô24×Ö½Ú
 };
-long size = sizeof(struct sleepdata);  //å‚¨å­˜sizeof(struct sleepdata)
+extern size; //´¢´æsizeof(struct sleepdata)
+//º¯ÊıÉùÃ÷
+int inputchoice(void);
+FILE* openfile(char filename[],char*openmode);
+void closefile(FILE* fp);
+long getLogcount(FILE*cfptr);
+double getprevHours(FILE* cfptr, int endid);
+void createNewStructTo(struct sleepdata* sleeplog);
+void newlog(FILE*cfptr);
+void listall(FILE*cfptr);
+void fresh(FILE* dfptr); 
+void correction(FILE* dfptr);
+//time related functions-in 
+long getTimenow_long(void);
+long getDatenow(void);
+char* getTimenow_str(char Time[]);
+
+//test functions-in "tests.c"
+void getprevHours_test(FILE* fp, int IDfortest);

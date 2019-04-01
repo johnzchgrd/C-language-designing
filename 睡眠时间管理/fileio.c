@@ -1,4 +1,6 @@
-//麓貌驴陋脦脛录镁
+#include"sleep.h"  
+
+//打开文件
 FILE* openfile(char filename[],char*openmode){
   FILE*fp;
   if((fp = fopen(filename, openmode))==NULL){
