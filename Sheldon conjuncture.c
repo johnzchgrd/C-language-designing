@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<math.h>
-#define MAX 10e64   //double: ±(10e-308~10e308)
+#include<stdlib.h>
+#define MAX 10e10   //double: ±(10e-308~10e308)
 #define START 2
 #define END MAX
 
@@ -22,22 +23,26 @@ int prime(int m){
 	  return 0; 
 }
 
-double fastproduction(double product, short bit){
+unsigned long long fastproduction(unsigned long long product, short bit){
 	//传入bit范围2~9，手动加速
-	short n=bit/2,m=bit%2;//bit=2*n+m
-        double two = product<<n;
-        if(m==0){
-           return two;
-        }
-        else
-           return two+product;
-
+	switch(bit){
+		case 2: return product<<1;
+		case 3: return product+product<<1;
+		case 4: return product<<2;
+		case 5: return product+product<<2;
+		case 6: return product<<2+product<<1;
+		case 7: return product+product<<2+product<<1;
+		case 8: return product<<3;
+		case 9: return product+product<<3;
+		default: printf("\nThere's something wrong with the FASTPRODUCTION function.\n");exit(1);
+	}
+	
 }
 
 int sheldonprime(int primenumber, int prime){
-	double product = 1;//保存乘积——乘法运算的化简是降低计算时间复杂度的必由之路
+	unsigned long long product = 1;//保存乘积——乘法运算的化简是降低计算时间复杂度的必由之路
 	short smallest_bit = 1;//从最低位开始，向高位提取，逐一向右移动所有位，遇到0直接跳出循环
-	double ratio=0;
+	unsigned long long ratio=0;
 	
 	//分解传入素数
 	while(prime != 0){
@@ -60,13 +65,14 @@ int sheldonprime(int primenumber, int prime){
 
 
 int main(void){
-	int index, primenumber = 0, sheldonflag = 0;//遍历参数，第n个素数，是否为Sheldon素数的标志
-	int isprime;
-	double delta = END - START;
+	int index, primenumber = 0, sheldonflag = 0;
+	//遍历参数，第n个素数，是否为Sheldon素数的标志
+	int isprime;//判断是否为素数的中间变量。传递优化？
+	//unsigned long long delta = END - START;
 	//仿佛听到了CPU的咆哮声……
 	for(index = START;index <= END;index++){
 		//printf("progress: %.2f%%\r",index/(delta));
-		printf("progress: %064d\r",index);//显示进度--暂未成功
+		printf("progress: %064d\r",index);//显示进度--十分简陋
 		isprime = prime(index);//判断是否为素数
 		if(isprime == 1){
 			primenumber++;
