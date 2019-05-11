@@ -24,10 +24,14 @@ int prime(int m){
 
 double fastproduction(double product, short bit){
 	//传入bit范围2~9，手动加速
-	switch(bit){
-		case 2: return  
-		case 3:
-	}
+	short n=bit/2,m=bit%2;//bit=2*n+m
+        double two = product<<n;
+        if(m==0){
+           return two;
+        }
+        else
+           return two+product;
+
 }
 
 int sheldonprime(int primenumber, int prime){
