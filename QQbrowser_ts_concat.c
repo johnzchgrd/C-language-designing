@@ -1,6 +1,7 @@
 /** \file temp.c
   *
   *This is a simple IO batch processing C function that provide fast access to concatenate hundreds and thousands of ts somehow downloaded from the Internet. 
+  * A much simpler way to do this is "copy /b *.ts out.ts" in windows.
   *Have fun!
   *\author johnzchgrd@github.com
   *\date 2019/06/30
